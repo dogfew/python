@@ -8,7 +8,7 @@ while i < N - 2:
     prime_2 = True
     k, m = n + 7, n + 5
     n = n + 6
-    sqrt = int(math.sqrt(m)) + 1
+    sqrt = int(math.sqrt(m))
     for j in prime_numbers:
         if k % j == 0:
             prime_1 = False
