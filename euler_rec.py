@@ -7,4 +7,4 @@ def f(x):
 	else:
 		return x
 e = 2 + 1 / f(1)
-print(e)
+print(f'{e:.{min(value, 50)}f}')
