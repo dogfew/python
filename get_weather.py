@@ -4,7 +4,7 @@ import requests, time, datetime, sys
 def get_weather(message):
     message.pop(0)
     *country, city = message
-    key = '3f67c853294f2b1b8823a1ddf2de888a'
+    key = '' # do not forget to enter your openweathermap key!
     response = requests.get(
         f'https://api.openweathermap.org/data/2.5/weather?q={city},{country}&exclude=current&appid={key}').json()
     if response['cod'] == 200:
