@@ -90,6 +90,12 @@ def prop(P):
     return properties
 
 
+def order(P):
+    properties = prop(P)
+    PO = properties['Антирефлексивность'] and properties['Транзитивность']
+    WO = PO and properties['Отрицательная транзитивность'] and properties['Ассиметричность']
+    LO = WO and properties['Связность']
+    return {'PO': PO, 'WO': WO, 'LO': LO}
 
 
 def cycle(P):
