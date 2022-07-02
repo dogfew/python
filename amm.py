@@ -86,12 +86,14 @@ class Customer:
         prev_y = pool.y
         pool.x += amount
         self.y += prev_y - pool.y
+        self.x -= amount
 
     def offer_y(self, amount, pool: AMM):
         assert self.y - amount >= 0
         prev_x = pool.x
         pool.y += amount
         self.x += prev_x - pool.x
+        self.y -= amount
 
     def offer_liquidity_x(self, amount, pool: AMM):
         assert self.x - amount >= 0
@@ -102,7 +104,7 @@ class Customer:
         assert self.y - amount >= 0
         pool.add_liquidity(x=0, y=amount, provider=self.hash)
         self.y -= amount
-
+        
     def take_liquidity_x(self, amount, pool: AMM):
         pool.take_liquidity(x=amount, y=0, provider=self.hash)
         self.x += amount
@@ -117,4 +119,3 @@ class Customer:
 
     def __repr__(self):
         return "Customer {}\nx:\t{}\ny:\t{}\nmoney:  {}".format(self.hash, self.x, self.y, self.m)
-
