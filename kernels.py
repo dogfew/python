@@ -1,7 +1,6 @@
 import numpy as np
 from numpy import exp, log, log1p, abs
 import plotly.graph_objects as go
-from ast import literal_eval
 
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import r2_score
@@ -40,6 +39,7 @@ def plot_sin(func, degree, lambda_):
     x, z = np.mgrid[-1:1:2 / size, -1:1:2 / size]
     f = eval('lambda x, z: ' + func)
     Y = f(x, z)
+    Y += np.random.normal(0, 0.03, size=Y.shape)
 
     X = np.vstack((x.flatten(), z.flatten())).T
     y = Y.flatten()
