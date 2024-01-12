@@ -1,4 +1,5 @@
 from collections import defaultdict
+from itertools import product, permutations
 
 def male_without_match(matches, males):
     for male in males:
@@ -81,6 +82,42 @@ def check_stable(male_prefs, female_prefs, pairs):
                 blocking_pairs.append((woman, woman))
     return blocking_pairs
 
+def all_possible_combinations(male_prefs, female_prefs, current_match={}):
+    males = list(male_prefs.keys())
+    females = list(female_prefs.keys())
+
+    if len(current_match) == len(males):
+        return [current_match.copy()]
+
+    current_male = males[len(current_match)]
+    possible_matches = []
+
+    for female in females + [None]:
+        if female is None or female not in current_match.values():
+            current_match[current_male] = female
+            possible_matches.extend(
+                all_possible_combinations(male_prefs, female_prefs, current_match)
+                )
+            current_match.pop(current_male)
+
+    return possible_matches
+
+
+def all_stable_combinations(male_prefs, female_prefs):
+    res = []
+    for pairs in all_possible_combinations(male_prefs, female_prefs):
+        if len(check_stable(male_prefs, female_prefs, pairs)) == 0:
+            res.append(pairs)
+    return res
+
+
+def get_achievable_parners(male_prefs, female_prefs):
+    """wrt to male"""
+    stable_combinations = all_stable_combinations(male_prefs, female_prefs)
+    return {male: set(stable_combination.get(male, None)
+            for stable_combination in stable_combinations)
+            for male in male_prefs}
+
 
 male_prefs = {
     "Joey": ["Rachel", "Monica", "Phoebe"],
@@ -101,5 +138,9 @@ for pairs in [
     deferred_acceptance(male_prefs, female_prefs),
     {v:k for k, v in deferred_acceptance(female_prefs, male_prefs).items()}
 ]:
-    print(check_stable(male_prefs, female_prefs, pairs))
-    print()
+    check_stable(male_prefs, female_prefs, pairs)
+
+get_achievable_parners(male_prefs, female_prefs)
+get_achievable_parners(female_prefs, male_prefs)
+
+print(all_stable_combinations(male_prefs, female_prefs))
