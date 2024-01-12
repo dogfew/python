@@ -6,7 +6,7 @@ def male_without_match(matches, males):
             return male
 
 
-def deferred_acceptance(male_prefs, female_prefs, silent=True):
+def deferred_acceptance(male_prefs, female_prefs, silent=False):
     female_queue = defaultdict(int)
 
     males = list(male_prefs.keys())
@@ -30,7 +30,9 @@ def deferred_acceptance(male_prefs, female_prefs, silent=True):
             print('Trying %s with %s... ' % (male, female), end='')
 
         prev_male = matches.get(female, None)
-
+        if male not in female_prefs[female]:
+            print("rejected")
+            continue
         if not prev_male:
             matches[male] = female
             matches[female] = male
@@ -62,7 +64,7 @@ def check_stable(male_prefs, female_prefs, pairs):
     for male in male_prefs:
         current_match = pairs_man[male]
         if current_match not in male_prefs[male] and current_match is not None:
-            blocking_pairs.append((male, None))
+            blocking_pairs.append((male, male))
         for i, woman in enumerate(male_prefs[male]):
             if woman == current_match:
                 break
@@ -76,7 +78,7 @@ def check_stable(male_prefs, female_prefs, pairs):
                 if potential_female_match_index < curr_female_match_index:
                     blocking_pairs.append((male, woman))
             except Exception as e:
-                blocking_pairs.append((None, woman))
+                blocking_pairs.append((woman, woman))
     return blocking_pairs
 
 
@@ -101,4 +103,3 @@ for pairs in [
 ]:
     print(check_stable(male_prefs, female_prefs, pairs))
     print()
-
