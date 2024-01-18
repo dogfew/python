@@ -122,28 +122,102 @@ def get_achievable_parners(male_prefs, female_prefs):
     }
 
 
+def make_priorities(
+    male_prefs,
+    female_prefs,
+):
+    priorities = []
+    for i in range(len(male_prefs)):
+        for j in range(len(female_prefs)):
+            if j != i and (j, i) not in priorities:
+                priorities.append((j, i))
+            if (i, j) not in priorities:
+                priorities.append((i, j))
+    return priorities
+
+
+def priority_match(male_prefs, female_prefs, priorities=None, silent=False):
+    from copy import deepcopy
+
+    priorities = [(i - 1, j - 1) for i, j in priorities]
+    if priorities is None:
+        priorities = make_priorities()
+    male_prefs_copy = deepcopy(male_prefs)
+    female_prefs_copy = deepcopy(female_prefs)
+    pairs = {}
+    i = 0
+    while len(female_prefs_copy) != 0 or len(male_prefs_copy) != 0:
+        flag = False
+        for i, j in priorities:
+            matches_men = {man: prefs[i] for man, prefs in male_prefs_copy.items()}
+            for woman, prefs in female_prefs_copy.items():
+                man = prefs[j]
+                if man in matches_men.keys() and matches_men[prefs[j]] == woman:
+                    print(f"Match: ({i+1}-{j+1})", man, woman)
+                    male_prefs_copy = {
+                        k: [v for v in prefs if v != woman]
+                        for k, prefs in male_prefs_copy.items()
+                        if k != man
+                    }
+                    female_prefs_copy = {
+                        k: [v for v in prefs if v != man]
+                        for k, prefs in female_prefs_copy.items()
+                        if k != woman
+                    }
+                    pairs[man] = woman
+                    flag = True
+                    break
+            if flag:
+                break
+    return pairs
+
+
 male_prefs = {
-    "Joey": ["Rachel", "Monica", "Phoebe"],
-    "Ross": ["Rachel", "Phoebe"],
-    "Chandler": ["Monica", "Phoebe", "Rachel"],
+    "m1": ["w2", "w1", "w3"],
+    "m2": ["w2", "w3", "w1"],
+    "m3": ["w3", "w1", "w2"],
 }
 
 female_prefs = {
-    "Rachel": ["Ross", "Joey", "Chandler"],
-    "Monica": ["Chandler", "Joey"],
-    "Phoebe": ["Joey", "Ross", "Chandler"],
+    "w1": ["m2"],
+    "w2": ["m3", "m1", "m2"],
+    "w3": ["m1", "m2", "m3"],
 }
 
-for pairs in [
-    {"Joey": "Rachel", "Chandler": "Phoebe"},
-    {"Joey": "Rachel", "Ross": "Monica", "Chandler": "Phoebe"},
-    {"Ross": "Rachel", "Joey": "Monica", "Chandler": "Phoebe"},
-    deferred_acceptance(male_prefs, female_prefs),
-    {v: k for k, v in deferred_acceptance(female_prefs, male_prefs).items()},
-]:
-    check_stable(male_prefs, female_prefs, pairs)
+# res = priority_match(
+#         male_prefs,
+#         female_prefs,
+#         priorities=(
+#             [(1, 1), (2, 1), (1, 2),
+#              (1, 3), (3, 1), (2, 2),
+#              (3, 2), (2, 3), (3, 3)]
+#         ),
+#     )
+# print(res)
+# print(check_stable(male_prefs, female_prefs, res))
 
-get_achievable_parners(male_prefs, female_prefs)
-get_achievable_parners(female_prefs, male_prefs)
+# for pairs in [
+#     {"Joey": "Rachel", "Chandler": "Phoebe"},
+#     {"Joey": "Rachel", "Ross": "Monica", "Chandler": "Phoebe"},
+#     {"Ross": "Rachel", "Joey": "Monica", "Chandler": "Phoebe"},
+#     deferred_acceptance(male_prefs, female_prefs),
+#     {v: k for k, v in deferred_acceptance(female_prefs, male_prefs).items()},
+# ]:
+#     check_stable(male_prefs, female_prefs, pairs)
 
-print(all_stable_combinations(male_prefs, female_prefs))
+# print((male_prefs, female_prefs))
+# print(get_achievable_parners(female_prefs, male_prefs))
+# # print(all_stable_combinations(male_prefs, female_prefs))
+# print(deferred_acceptance(male_prefs, female_prefs))
+print(deferred_acceptance(male_prefs, female_prefs))
+# print(get_achievable_parners(male_prefs, female_prefs))
+
+
+# male_prefs = {f"m{i}":[] for i in range(1, 4)}
+# female_prefs = {f"f{i}" :[] for i in range(1, 6)}
+
+# combos = [d
+#         for d in
+#         all_possible_combinations(male_prefs, female_prefs)
+#         if None not in d.values()]
+# print(len(combos))
