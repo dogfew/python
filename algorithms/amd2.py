@@ -4,12 +4,12 @@ import networkx as nx
 import networkx.exception
 
 
-# preferences = {
-#     "p1": ["D", "C", "A", "B"],
-#     "p2": ["C", "B", "A", "D"],
-#     "p3": ["B", "D", "A", "C"],
-#     "p4": ["D", "A", "B", "C"],
-# }
+preferences = {
+    "p1": ["D", "C", "A", "B"],
+    "p2": ["C", "B", "A", "D"],
+    "p3": ["B", "D", "A", "C"],
+    "p4": ["D", "A", "B", "C"],
+}
 #
 # preferences = {
 #     "p1": ["B", "C", "A", "D"],
@@ -171,7 +171,7 @@ class PriorityLine(TopTradingCycle):
             k: [i for i in v if i != key] for k, v in self.__preferences.items()
         }
 
-    def run(self, ownership, order=None, silent=False):
+    def run(self, ownership, order=None, **kwargs):
         if order is None:
             order = list(self.preferences.keys())
         graph = self.initialize_graph(ownership)
@@ -183,8 +183,7 @@ class PriorityLine(TopTradingCycle):
             if graph.has_node(desired_item) and len(graph[desired_item]):
                 owner = list(graph[desired_item].keys())[0]
                 if owner in order and owner not in queue:
-                    if not silent:
-                        print(f"{human} wants {desired_item}, but it's occupied by {owner}.")
+                    print(f"{human} wants {desired_item}, but it's occupied by {owner}.")
                     if order.index(owner) >= order.index(human):
                         order.remove(owner)
                         order.insert(0, owner)
@@ -192,33 +191,76 @@ class PriorityLine(TopTradingCycle):
                         queue[human] = desired_item
                         continue
                 else:
-                    if not silent:
-                        print(f"{human} requests {desired_item}")
+                    print(f"{human} requests {desired_item}")
                     if owner in queue:
-                        if not silent:
-                            print(f"Time for {owner} to request {queue[owner]}")
+                        print(f"Time for {owner} to request {queue[owner]}")
                         graph.add_edge(owner, queue.pop(owner))
             else:
                 print(f"{human} takes {desired_item}")
                 graph.add_edge(desired_item, human)
             graph.add_edge(human, desired_item)
             try:
-                results = super().remove_cycles(graph, results, silent=silent)
+                results = super().remove_cycles(graph, results, silent=False)
                 order = [x for x in order if results[x] is None]
             except networkx.exception.NetworkXNoCycle:
                 pass
         return results
 
+### Q1
 
+# a, b
 preferences = {
-    "p1": list("DABC"),
-    'p2': list("DBCA"),
-    'p3': list("CABD"),
-    'p4': list("CDBA")
+    "p1": list("DCAB"),
+    'p2': list("CBAD"),
+    'p3': list("BDAC"),
+    'p4': list("DABC")
 }
-ownership = {"p2": "A", "p3": "B"}
-algorithm = PriorityLine(preferences)
-res = algorithm.run(ownership, order=['p' + x for x in list('1243')], silent=False)
-print(res)
-print(list(res.values()))
-print(is_pareto_efficient(preferences, list(res.values())))
+print([''.join(x) for x in SerialDictatorship(preferences).find_all_pe()])
+unique = []
+for k, v in SerialDictatorship(preferences).check_all_orders().items():
+    outcome = ''.join(list(v.values()))
+    if outcome not in unique:
+        unique.append(outcome)
+    print(f"{', '.join(k)} $\Rightarrow$ {outcome}")#, (k.index('p1') > k.index('p4')) and (k.index('p1') < k.index('p2')) and (k.index('p1') > k.index('p3')))
+print(unique)
+print(is_pareto_efficient(preferences, ['C', 'B', 'A', 'D']))
+#c
+# print(TopTradingCycle(preferences).run(list('BADC'), silent=False))
+### Q2 Priority Line Algorithm
+#
+# for order in ['2134', '1243', '4132']:
+#     print('-' * 16 + '\n' + '-' * 16)
+#     print(f'order:', *["p" + x for x in list(order)])
+#     preferences = {
+#         "p1": list("DABC"),
+#         'p2': list("DBCA"),
+#         'p3': list("CABD"),
+#         'p4': list("CDBA")
+#     }
+#     ownership = {"p2": "A", "p3": "B"}
+#     algorithm = PriorityLine(preferences)
+#     res = algorithm.run(ownership, order=['p' + x for x in list(order)], silent=False)
+#     print('Algorithm Result:', res)
+#     print('PE:', is_pareto_efficient(preferences, list(res.values())))
+
+
+### Q3. Number of Pareto Efficient Assignments
+
+#a
+#
+# preferences = {
+#     'p1': list('ABC'),
+#     'p2': list('BCA'),
+#     'p3': list('CAB')
+# }
+# print(SerialDictatorship(preferences).find_all_res())
+# ### Q4 (20 points) Properties of Pareto Efficient Assignments
+
+# preferences = {
+#     "p1": ['A', "B"],
+#     'p2': ['A', 'B']
+# }
+# pe = SerialDictatorship(preferences)
+# print(sorted([''.join(x) for x in pe.find_all_pe()]))
+# print(sorted([''.join(list(v.values())) for v in pe.find_all_res()]))
+# print(is_pareto_efficient(preferences, list("BA")))

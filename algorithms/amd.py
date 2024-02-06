@@ -154,70 +154,80 @@ def priority_match(male_prefs, female_prefs, priorities=None, silent=False):
                 man = prefs[j]
                 if man in matches_men.keys() and matches_men[prefs[j]] == woman:
                     print(f"Match: ({i+1}-{j+1})", man, woman)
-                    male_prefs_copy = {
-                        k: [v for v in prefs if v != woman]
-                        for k, prefs in male_prefs_copy.items()
-                        if k != man
-                    }
-                    female_prefs_copy = {
-                        k: [v for v in prefs if v != man]
-                        for k, prefs in female_prefs_copy.items()
-                        if k != woman
-                    }
+                    # male_prefs_copy = {
+                    #     k: [v for v in prefs if v != woman]
+                    #     for k, prefs in male_prefs_copy.items()
+                    #     if k != man
+                    # }
+                    # female_prefs_copy = {
+                    #     k: [v for v in prefs if v != man]
+                    #     for k, prefs in female_prefs_copy.items()
+                    #     if k != woman
+                    # }
                     pairs[man] = woman
                     flag = True
-                    break
+            for man, woman in pairs.items():
+                male_prefs_copy = {
+                    k: [v for v in prefs if v != woman]
+                    for k, prefs in male_prefs_copy.items()
+                    if k != man
+                }
+                female_prefs_copy = {
+                    k: [v for v in prefs if v != man]
+                    for k, prefs in female_prefs_copy.items()
+                    if k != woman
+                }
             if flag:
                 break
     return pairs
 
 
 male_prefs = {
-    "m1": ["w2", "w1", "w3"],
-    "m2": ["w2", "w3", "w1"],
-    "m3": ["w3", "w1", "w2"],
+    "m1": ["w2", "w3", "w1"],
+    "m2": ["w1", "w3", "w2"],
+    "m3": ["w1", "w3", "w2"],
 }
 
 female_prefs = {
-    "w1": ["m2"],
-    "w2": ["m3", "m1", "m2"],
-    "w3": ["m1", "m2", "m3"],
+    "w1": ["m1", "m2", "m3"],
+    "w2": ["m2", "m3", "m1"],
+    "w3": ["m1", "m3", "m2"],
 }
 
-# res = priority_match(
-#         male_prefs,
-#         female_prefs,
-#         priorities=(
-#             [(1, 1), (2, 1), (1, 2),
-#              (1, 3), (3, 1), (2, 2),
-#              (3, 2), (2, 3), (3, 3)]
-#         ),
-#     )
-# print(res)
-# print(check_stable(male_prefs, female_prefs, res))
+res = priority_match(
+        male_prefs,
+        female_prefs,
+        priorities=(
+            [(1, 1), (2, 1), (1, 2),
+              (1, 3), (3, 1), (2, 2),
+              (3, 2), (2, 3), (3, 3)]
+        ),
+    )
+print(res)
+print(check_stable(male_prefs, female_prefs, res))
 
 # for pairs in [
 #     {"Joey": "Rachel", "Chandler": "Phoebe"},
 #     {"Joey": "Rachel", "Ross": "Monica", "Chandler": "Phoebe"},
 #     {"Ross": "Rachel", "Joey": "Monica", "Chandler": "Phoebe"},
-#     deferred_acceptance(male_prefs, female_prefs),
-#     {v: k for k, v in deferred_acceptance(female_prefs, male_prefs).items()},
+#     deferred_acceptance(student_prefs, school_prefs),
+#     {v: k for k, v in deferred_acceptance(school_prefs, student_prefs).items()},
 # ]:
-#     check_stable(male_prefs, female_prefs, pairs)
+#     check_stable(student_prefs, school_prefs, pairs)
 
 # print((male_prefs, female_prefs))
-# print(get_achievable_parners(female_prefs, male_prefs))
-# # print(all_stable_combinations(male_prefs, female_prefs))
-# print(deferred_acceptance(male_prefs, female_prefs))
-print(deferred_acceptance(male_prefs, female_prefs))
 # print(get_achievable_parners(male_prefs, female_prefs))
+# # print(all_stable_combinations(student_prefs, school_prefs))
+# print(deferred_acceptance(student_prefs, school_prefs))
+# print(deferred_acceptance(student_prefs, school_prefs))
+# print(get_achievable_parners(student_prefs, school_prefs))
 
 
-# male_prefs = {f"m{i}":[] for i in range(1, 4)}
-# female_prefs = {f"f{i}" :[] for i in range(1, 6)}
+# student_prefs = {f"m{i}":[] for i in range(1, 4)}
+# school_prefs = {f"f{i}" :[] for i in range(1, 6)}
 
 # combos = [d
 #         for d in
-#         all_possible_combinations(male_prefs, female_prefs)
+#         all_possible_combinations(student_prefs, school_prefs)
 #         if None not in d.values()]
 # print(len(combos))
